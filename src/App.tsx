@@ -3,16 +3,16 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Game from './pages/Game';
-import { Difficulty, PieceColor } from './types/chess';
+import { Difficulty, PieceColor, GameMode } from './types/chess';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [playerColor, setPlayerColor] = useState<PieceColor>('white');
 
-  const startGame = (diff: Difficulty, color: PieceColor) => {
-    setDifficulty(diff);
-    setPlayerColor(color);
+  const startGame = (mode: GameMode, diff?: Difficulty, color?: PieceColor) => {
+    if (diff) setDifficulty(diff);
+    if (color) setPlayerColor(color);
     setCurrentPage('game');
   };
 

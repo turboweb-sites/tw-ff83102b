@@ -27,6 +27,7 @@ export interface Move {
 }
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
+export type GameMode = 'bot' | 'pvp';
 
 export type GameStatus = 'waiting' | 'playing' | 'check' | 'checkmate' | 'stalemate' | 'draw';
 
@@ -38,6 +39,7 @@ export interface GameState {
   selectedSquare: Position | null;
   validMoves: Position[];
   capturedPieces: { white: Piece[]; black: Piece[] };
+  gameMode: GameMode;
   playerColor: PieceColor;
   difficulty: Difficulty;
   enPassantTarget: Position | null;

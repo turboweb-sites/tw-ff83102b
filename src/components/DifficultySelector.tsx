@@ -1,11 +1,12 @@
-import { Brain, Zap, Trophy, Shield } from 'lucide-react';
+import { Brain, Zap, Trophy, ArrowLeft } from 'lucide-react';
 import { Difficulty, PieceColor } from '../types/chess';
 
 interface DifficultySelectorProps {
   onStart: (difficulty: Difficulty, color: PieceColor) => void;
+  onBack: () => void;
 }
 
-export default function DifficultySelector({ onStart }: DifficultySelectorProps) {
+export default function DifficultySelector({ onStart, onBack }: DifficultySelectorProps) {
   const difficulties: { id: Difficulty; label: string; desc: string; icon: any; color: string; glow: string }[] = [
     {
       id: 'easy',
@@ -40,6 +41,15 @@ export default function DifficultySelector({ onStart }: DifficultySelectorProps)
 
   return (
     <div className="space-y-12 animate-slide-up">
+      {/* Back button */}
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span>Назад к выбору режима</span>
+      </button>
+
       {/* Difficulty cards */}
       <div>
         <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">

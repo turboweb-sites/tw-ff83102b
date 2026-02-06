@@ -1,4 +1,4 @@
-import { Board, Piece, PieceColor, PieceType, Position, Move, GameState, Difficulty, GameStatus } from '../../types/chess';
+import { Board, Piece, PieceColor, PieceType, Position, Move, GameState, Difficulty, GameStatus, GameMode } from '../../types/chess';
 import { deepCopyBoard, getValidMoves, getAllValidMoves, isInCheck, getMoveNotation } from './moves';
 
 export function createInitialBoard(): Board {
@@ -16,7 +16,11 @@ export function createInitialBoard(): Board {
   return board;
 }
 
-export function createInitialGameState(playerColor: PieceColor = 'white', difficulty: Difficulty = 'medium'): GameState {
+export function createInitialGameState(
+  gameMode: GameMode = 'bot',
+  playerColor: PieceColor = 'white',
+  difficulty: Difficulty = 'medium'
+): GameState {
   return {
     board: createInitialBoard(),
     currentTurn: 'white',
@@ -25,6 +29,7 @@ export function createInitialGameState(playerColor: PieceColor = 'white', diffic
     selectedSquare: null,
     validMoves: [],
     capturedPieces: { white: [], black: [] },
+    gameMode,
     playerColor,
     difficulty,
     enPassantTarget: null,

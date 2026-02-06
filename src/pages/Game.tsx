@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Difficulty, PieceColor, GameState } from '../types/chess';
+import { Difficulty, PieceColor, GameState, GameMode } from '../types/chess';
 import { createInitialGameState } from '../lib/chess/game';
 import ChessBoard from '../components/ChessBoard';
 import GameInfo from '../components/GameInfo';
@@ -7,22 +7,40 @@ import MoveHistory from '../components/MoveHistory';
 
 interface GameProps {
   onNavigate: (page: string) => void;
+  gameMode: GameMode;
   difficulty: Difficulty;
   playerColor: PieceColor;
 }
 
-export default function Game({ onNavigate, difficulty, playerColor }: GameProps) {
+export default function Game({ onNavigate, gameMode, difficulty, playerColor }: GameProps) {
   const [gameState, setGameState] = useState<GameState>(() =>
-    createInitialGameState(playerColor, difficulty)
+    createInitialGameState(gameMode, playerColor, difficulty)
   );
 
   const handleRestart = useCallback(() => {
-    setGameState(createInitialGameState(playerColor, difficulty));
-  }, [playerColor, difficulty]);
+    setGameState(createInitialGameState(gameMode, playerColor, difficulty));
+  }, [gameMode, playerColor, difficulty]);
 
   const handleHome = useCallback(() => {
     onNavigate('home');
   }, [onNavigate]);
+
+  const getGameOverTitle = () => {
+    if (gameState.status === 'stalemate') return 'Пат! Ничья';
+    
+    if (gameMode === 'pvp') {
+      const winner = gameState.currentTurn === 'white' ? 'Чёрные' : 'Белые';
+      return `Мат! Победили ${winner}!`;
+    }
+    
+    return gameState.currentTurn === playerColor ? 'Мат! Вы проиграли' : 'Мат! Вы победили!';
+  };
+
+  const getGameOverEmoji = () => {
+    if (gameState.status === 'stalemate') return '🤝';
+    if (gameMode === 'pvp') return '🏆';
+    return gameState.currentTurn === playerColor ? '💀' : '🏆';
+  };
 
   return (
     <div className="min-h-screen py-6 px-4 sm:px-6">
@@ -31,21 +49,15 @@ export default function Game({ onNavigate, difficulty, playerColor }: GameProps)
         {(gameState.status === 'checkmate' || gameState.status === 'stalemate') && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
             <div className="glass-strong rounded-3xl p-8 max-w-md w-full mx-4 text-center animate-slide-up">
-              <div className="text-6xl mb-4">
-                {gameState.status === 'checkmate'
-                  ? (gameState.currentTurn === playerColor ? '💀' : '🏆')
-                  : '🤝'}
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                {gameState.status === 'checkmate'
-                  ? (gameState.currentTurn === playerColor ? 'Мат! Вы проиграли' : 'Мат! Вы победили!')
-                  : 'Пат! Ничья'}
-              </h2>
+              <div className="text-6xl mb-4">{getGameOverEmoji()}</div>
+              <h2 className="text-2xl font-bold text-white mb-2">{getGameOverTitle()}</h2>
               <p className="text-gray-400 mb-6">
-                {gameState.status === 'checkmate' && gameState.currentTurn !== playerColor
+                {gameState.status === 'checkmate' && gameMode === 'bot' && gameState.currentTurn !== playerColor
                   ? 'Отличная игра! Бот повержен.'
-                  : gameState.status === 'checkmate'
+                  : gameState.status === 'checkmate' && gameMode === 'bot'
                   ? 'Попробуйте ещё раз или смените сложность.'
+                  : gameState.status === 'checkmate'
+                  ? 'Отличная партия!'
                   : 'Ни одна сторона не может сделать ход.'}
               </p>
               <p className="text-sm text-gray-500 mb-6">

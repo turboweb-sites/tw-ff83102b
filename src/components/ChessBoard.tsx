@@ -11,7 +11,7 @@ interface ChessBoardProps {
 }
 
 export default function ChessBoard({ gameState, setGameState }: ChessBoardProps) {
-  const { board, currentTurn, playerColor, selectedSquare, validMoves, status, moveHistory, enPassantTarget } = gameState;
+  const { board, currentTurn, playerColor, selectedSquare, validMoves, status, moveHistory, enPassantTarget, gameMode } = gameState;
 
   const isFlipped = playerColor === 'black';
   const lastMove = moveHistory.length > 0 ? moveHistory[moveHistory.length - 1] : null;
@@ -67,7 +67,14 @@ export default function ChessBoard({ gameState, setGameState }: ChessBoardProps)
 
   // Bot move
   useEffect(() => {
-    if (currentTurn !== playerColor && (status === 'playing' || status === 'check') && !gameState.isThinking) {
+    // Only run if game mode is bot
+    if (gameMode !== 'bot') return;
+    
+    // Check if it's bot's turn and game is active
+    const isBotTurn = currentTurn !== playerColor;
+    const isGameActive = status === 'playing' || status === 'check';
+    
+    if (isBotTurn && isGameActive && !gameState.isThinking) {
       setGameState(prev => ({ ...prev, isThinking: true }));
 
       const timer = setTimeout(() => {
@@ -84,7 +91,7 @@ export default function ChessBoard({ gameState, setGameState }: ChessBoardProps)
 
       return () => clearTimeout(timer);
     }
-  }, [currentTurn, playerColor, status, gameState.isThinking, board, enPassantTarget, gameState.difficulty, setGameState]);
+  }, [currentTurn, playerColor, status, board, enPassantTarget, gameState.difficulty, gameState.isThinking, gameMode, setGameState]);
 
   const getSquareColor = (row: number, col: number): string => {
     const isLight = (row + col) % 2 === 0;
